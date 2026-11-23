@@ -15,11 +15,11 @@
   <array>
     <dict>
       <key>CFBundleURLName</key>
-      <string>com.spikehd.dorion</string>
+      <string>com.astralcord.client</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <!-- register the dorion:// scheme -->
-        <string>dorion</string>
+        <!-- register the astralcord:// scheme -->
+        <string>astralcord</string>
         <!-- register the discord:// scheme -->
         <string>discord</string>
       </array>

@@ -1,9 +1,9 @@
 [package]
-name = "Dorion"
+name = "AstralCord"
 version = "7.0.1"
-description = "Tiny alternative Discord client with a smaller footprint, themes and plugins, multi-profile, and more!"
-authors = ["SpikeHD"]
-license = ""
+description = "AstralCord: a tiny Rust-based Discord client (fork of Dorion) with themes, plugins, multi-profile, and more!"
+authors = ["SpikeHD", "AstralCord contributors"]
+license = "GPL-3.0"
 repository = ""
 edition = "2024"
 rust-version = "1.96"

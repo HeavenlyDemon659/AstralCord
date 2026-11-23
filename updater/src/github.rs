@@ -2,6 +2,24 @@ use serde_json::Value;
 use std::io::Read;
 use std::{fmt::Display, fs, path::PathBuf};
 
+/// GitHub "owner/repo" that AstralCord updates come from (mirrors
+/// src-tauri/src/release.rs). Set by GitHub Actions via GITHUB_REPOSITORY,
+/// or overridden with ASTRALCORD_REPO at build time.
+const UPDATE_REPO: &str = match option_env!("ASTRALCORD_REPO") {
+  Some(repo) => repo,
+  None => match option_env!("GITHUB_REPOSITORY") {
+    Some(repo) => repo,
+    None => "",
+  },
+};
+
+/// Split UPDATE_REPO into (owner, repo).
+pub fn update_repo() -> Result<(&'static str, &'static str), String> {
+  UPDATE_REPO
+    .split_once('/')
+    .ok_or_else(|| "This build has no update source configured".to_string())
+}
+
 #[derive(Debug)]
 pub struct ReleaseData {
   pub tag_name: String,
@@ -16,7 +34,7 @@ pub fn get_release(user: impl AsRef<str>, repo: impl AsRef<str>) -> Result<Relea
   );
 
   let text = ureq::get(&url)
-    .set("User-Agent", "Dorion")
+    .set("User-Agent", "AstralCord")
     .call()
     .map_err(|e| format!("Failed to get latest release from GitHub: {e}"))?
     .into_string()
@@ -52,7 +70,10 @@ pub fn download_release(
 ) -> PathBuf {
   let url = format!("https://github.com/{user}/{repo}/releases/download/{tag_name}/{release_name}");
 
-  let response = ureq::get(&url).set("User-Agent", "Dorion").call().unwrap();
+  let response = ureq::get(&url)
+    .set("User-Agent", "AstralCord")
+    .call()
+    .unwrap();
 
   let mut file_path = path.clone();
   file_path.push(release_name.as_ref());

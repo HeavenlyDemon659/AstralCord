@@ -1,422 +1,65 @@
-<h1 align="center">
- <img height="100px" src="https://raw.githubusercontent.com/SpikeHD/Dorion/main/src-tauri/icons/icon.png" />
- <br />
- Dorion
-</h1>
 <div align="center">
- <img src="https://img.shields.io/github/actions/workflow/status/SpikeHD/Dorion/build.yml" />
- <img src="https://img.shields.io/github/package-json/v/SpikeHD/Dorion" />
- <img src="https://img.shields.io/github/repo-size/SpikeHD/Dorion" />
-</div>
-<div align="center">
- <img src="https://img.shields.io/github/commit-activity/m/SpikeHD/Dorion" />
- <img src="https://img.shields.io/github/release-date/SpikeHD/Dorion" />
- <img src="https://img.shields.io/github/stars/SpikeHD/Dorion" />
- <img src="https://img.shields.io/github/downloads/SpikeHD/Dorion/total" />
+  <img src="src-tauri/icons/icon.png" width="128" alt="AstralCord logo">
+  <h1>AstralCord</h1>
+  <p>A tiny, Rust-based Discord client for Linux and Windows.</p>
 </div>
 
-<div align="center">
- Dorion is an alternative Discord client aimed towards lower-spec or storage-sensitive PCs that supports themes, plugins, and more!
- <br />
- https://discord.gg/agQ9mRdHMZ
-</div>
+AstralCord runs Discord's own web app inside a lightweight native shell written in Rust with [Tauri](https://tauri.app). It's far smaller than the official client, and it supports:
 
-# Download
+- Voice and video calls
+- Themes, plus plugins via shelter, Vencord and Equicord
+- Rich Presence and push-to-talk
+- A tray icon and multiple profiles
 
-<table align="center">
-  <tr>
-    <th>
-      <img src="docs/image/windows.png" width="23%" align="center" />
-    </th>
-    <th>
-      <img src="docs/image/apple.png" width="23%" align="center" />
-    </th>
-    <th>
-      <img src="docs/image/debian.png" width="23%" align="center" />
-    </th>
-    <th>
-      <img src="docs/image/fedora.png" width="23%" align="center" />
-    </th>
-  </tr>
+AstralCord is a renamed fork of [Dorion](https://github.com/SpikeHD/Dorion) by SpikeHD. All the clever parts are theirs.
 
-  <tr>
-    <td width="23%">
-      <div align="center">
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1_x64_en-US.msi">x86_64</a>
-        <span>|</span>
-        <a href="https://github.com/SpikeHD/Dorion/releases/download/v7.0.1/Dorion_7.0.1.arm64-setup.exe">ARM</a>
-      </div>
-    </td>
-    <td width="23%">
-      <div align="center">
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1_x64.dmg">x86_64</a>
-        <span>|</span>
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1_aarch64.dmg">ARM</a>
-      </div>
-    </td>
-    <td width="23%">
-      <div align="center">
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1_amd64.deb">x86_64</a>
-        <span>|</span>
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1_arm64.deb">ARM64</a>
-      </div>
-    </td>
-    <td width="23%">
-      <div align="center">
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1-1.x86_64.rpm">x86_64</a>
-        <span>|</span>
-        <a href="https://github.com/SpikeHD/dorion/releases/download/v7.0.1/Dorion_7.0.1-1.aarch64.rpm">ARM64</a>
-      </div>
-    </td>
-  </tr>
-</table>
+## Download
 
-<details>
+Get the latest build from this repo's **Releases** page:
 
-<summary>View bleeding-edge builds</summary>
+| Platform | File | How to run |
+|---|---|---|
+| Windows 10/11 | `AstralCord_<version>_x64-setup.exe` | Run the installer |
+| Windows (no install) | `AstralCord_<version>_win64_portable.zip` | Unzip it and run `AstralCord.exe` |
+| Linux, any distro (Arch, Fedora, ...) | `AstralCord_<version>_linux_x64_portable.tar.gz` | Extract it and run `./AstralCord` |
+| Debian / Ubuntu / Mint | `AstralCord_<version>_amd64.deb` | `sudo apt install ./AstralCord_<version>_amd64.deb` |
 
-<h1>Bleeding Edge Builds</h1>
-<p>These builds are based on the latest GitHub Actions artifacts. They may not work properly, and they probably contain bugs. Use at your own risk!</p>
+Windows uses Microsoft Edge WebView2, which is already part of Windows 10/11. The Linux build bundles its own Chromium (CEF) runtime, which is what makes voice calls work.
 
-<table align="center">
-  <tr>
-    <th>
-      <img src="docs/image/windows.png" width="23%" align="center" />
-    </th>
-    <th>
-      <img src="docs/image/apple.png" width="23%" align="center" />
-    </th>
-    <th>
-      <img src="docs/image/debian.png" width="23%" align="center" />
-    </th>
-    <th>
-      <img src="docs/image/fedora.png" width="23%" align="center" />
-    </th>
-  </tr>
+Settings are stored in:
 
-  <tr>
-    <td width="23%">
-      <div align="center">
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-x86_64-pc-windows-msvc-msi.zip">x86_64</a>
-        <span>|</span>
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-aarch64-pc-windows-msvc-nsis.zip">ARM</a>
-      </div>
-    </td>
-    <td width="23%">
-      <div align="center">
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-x86_64-apple-darwin-dmg.zip">x86_64</a>
-        <span>|</span>
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-aarch64-apple-darwin-dmg.zip">ARM</a>
-      </div>
-    </td>
-    <td width="23%">
-      <div align="center">
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-x86_64-unknown-linux-gnu-deb.zip">x86_64</a>
-        <span>|</span>
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-aarch64-unknown-linux-gnu-deb.zip">ARM64</a>
-      </div>
-    </td>
-    <td width="23%">
-      <div align="center">
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-x86_64-unknown-linux-gnu-rpm.zip">x86_64</a>
-        <span>|</span>
-        <a href="https://nightly.link/SpikeHD/Dorion/workflows/build/main/dorion-aarch64-unknown-linux-gnu-rpm.zip">ARM64</a>
-      </div>
-    </td>
-  </tr>
-</table>
+- `%APPDATA%\astralcord` on Windows
+- `~/.config/astralcord` on Linux
 
-</details>
+Portable builds keep everything next to the program instead.
 
-> [!TIP]
-> Dorion can also be used portably or installed via [several package managers](#package-repositories).
-> You can find portable builds in the [releases](https://github.com/SpikeHD/dorion/releases/latest/) page. You can also [build](#building) Dorion yourself!
+## How builds work
 
-> [!NOTE]
-> ***MacOS Users***: If opening Dorion gives you "Dorion.app cannot be opened because it is from an unidentified developer", you may just need to run `sudo xattr -rd com.apple.quarantine /Applications/Dorion.app`. Alternatively, you can open the **Privacy & Security** settings pane and scroll down to the **Security** section to remove the quarantine.
->
-> ***Windows Users***: Defender may think Dorion is a virus. This just happens sometimes, and if SmartScreen blocks it from running, click "More Info" and "Run Anyways". Feel free to scan Dorion with [Virustotal](https://www.virustotal.com/gui/home/upload)!
+Every push to `main` runs [`.github/workflows/build.yml`](.github/workflows/build.yml) on GitHub Actions:
 
-# Table of Contents
+1. It builds Linux and Windows in parallel.
+2. It publishes the files as a Release named after the version in `src-tauri/tauri.conf.json` (for example `v7.0.1`).
 
-* [Package Repositories](#package-repositories)
-* [Features](#features)
-  * [Plugins](#plugins)
-  * [Themes](#themes)
-* [Platform Support](#platform-support)
-* [Building](#building)
-  * [Prerequisites](#prerequisites)
-  * [Steps](#steps)
-  * [Shared CEF](#shared-cef)
-* [Known Issues](#known-issues)
-* [Troubleshooting](#troubleshooting)
-  * [Things you Might be Asked to Provide](#things-you-might-be-asked-to-provide)
-  * [General](#general)
-  * [Windows](#windows)
-  * [Linux](#linux)
-* [TODO](#todo)
-* [Using Plugins, Extensions, and Themes](#using-plugins-extensions-and-themes)
-* [Contributing](#contributing)
-  * [Translating](#translating)
-  * [Contributors](#contributors)
-* [Screenshots](#screenshots)
+To ship an update, bump `version` in `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`, then push. Installed copies check this repo's Releases for new versions.
 
-# Package Repositories
+## Building locally
 
-I do **not** maintain any instances of Dorion in any package repositories myself, however some very kind people maintain some in their own spare time:
-
-* Windows:
-  * Shovel/Scoop (Maintained by [Small-Ku](https://github.com/Small-Ku/)):
-    ```sh
-    scoop bucket add turbo https://github.com/Small-Ku/turbo-bucket.git
-    scoop install turbo/dorion
-    ```
-  * WinGet (Maintained by [headquarter8302](https://github.com/headquarter8302))
-    ```sh
-    winget install --id SpikeHD.Dorion
-    ```
-* Linux:
-  * Arch AUR (Maintained by [YouKnow-sys](https://github.com/YouKnow-sys))
-    ```sh
-    yay -S dorion-bin
-    ```
-  * NixOS
-    ```sh
-    nix-shell -p dorion
-    ```
-* MacOS:
-  * Homebrew (Maintained by [psharma04](https://github.com/psharma04))
-    ```sh
-    brew tap psharma04/dorion
-    brew install --cask dorion
-    ```
-
-> [!NOTE]
-> Maintaining Dorion in a different package repository that I don't know about? Feel free to [open a PR](https://github.com/SpikeHD/Dorion/pulls) to add it here!
-
-# Features
-
-* [Significantly smaller](https://github.com/SpikeHD/Dorion/assets/25207995/eb603f1f-f633-4913-a25e-1316b495a08a) than the original Discord client and other web-based alternatives
-* Theme support
-* Global push-to-talk and custom keybinds
-* [Shelter](https://github.com/uwu/Shelter) and (optionally) [Vencord](https://github.com/vendicated/vencord)/[Equicord](https://github.com/equicord/equicord) included out of the box
-* Full [RPC/game presence](https://github.com/SpikeHD/rsRPC) support included out of the box.
-  * This also requires either the [shelteRPC](https://github.com/SpikeHD/shelter-plugins?tab=readme-ov-file#shelterpc) or [arRPC](https://vencord.dev/plugins/WebRichPresence%20(arRPC)) plugins to be enabled
-* (Hopefully) better low-end system performance, YMMV
-* ARM support for all platforms
-* Feature flags for those who build from source
-
-## Plugins
-
-Dorion comes with [shelter](https://github.com/uwu/shelter), so that should cover at least some plugin-related needs. You can also enable client mods like [Vencord](https://github.com/vendicated/vencord) inside the Dorion settings page.
-If you want to install plugins not available within the Dorion settings page, ensure you are downloading a browser-compatible version.
-
-> [!NOTE]
-> Want official support for another client mod? As long as it works on the web, feel free to submit a [feature request](https://github.com/SpikeHD/Dorion/issues/new/choose)!
-
-> [!TIP]
-> Unsure what shelter plugins exist out there? There's more than you think! Try searching `shelter plugins` on GitHub, or use the Plugin Browser plugin:
->
-> `https://spikehd.github.io/shelter-plugins/plugin-browser/`
-
-## Themes
-
-Dorion supports all themes, BetterDiscord and others, with a [couple caveats](#known-issues).
-
-[Jump to "Using Plugins and Themes"](#using-plugins-and-themes)
-
-# Platform Support
-
-<div width="100%" align="center">
-
-| Feature                                        | Windows 10/11 | Windows 7[^1] | Linux            | MacOS           |
-|------------------------------------------------|---------------|---------------|------------------|-----------------|
-| Basics (logging in, navigation, text/DMs etc.) | ✓             | ~             | ✓                | ✓               |
-| Voice                                          | ✓             | ~             | ✓                | ✓               |
-| Themes                                         | ✓             | ~             | ✓                | ✓               |
-| Shelter                                        | ✓             | ~             | ✓                | ✓               |
-| Dorion Plugins                                 | ✓             | ~             | ✓                | ✓               |
-
-</div>
-
-[^1]: Windows 7 support is possible by installing API extensions, such as VxKex. It could break at any point, and if this happens, I probably won't put much effort into fixing it (PRs always welcome of course!). You may also need to manually install [WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) if Dorion doesn't open after installing!
-
-# Building
-
-## Prerequisites
-
-* [NodeJS](https://nodejs.org)
-* [PNPM](https://pnpm.io/)
-* [Rust and Cargo](https://www.rust-lang.org/tools/install)
-* [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
-
-## Steps
-
-1. Clone/download the repository
-2. Open a terminal window in the root project folder
-3. Install JS dependencies:
-
-    ```sh
-    pnpm install
-    ```
-
-4. Pull the latest shelter build (this is used as a backup if it cannot be fetched on the fly)
-
-    ```sh
-    pnpm shupdate
-    ```
-
-5. Build the updater
-
-    ```sh
-    pnpm build:updater
-    ```
-
-6. Build!
-
-    ```sh
-    # Build Dorion...
-    pnpm tauri build
-
-    # ...or to debug/open in dev mode
-    pnpm dev
-    ```
-
-All built files will be in `src-tauri/target/(release|debug)/`. Installation files (eg. `.msi`, `.deb`) are located in `bundle/`.
-
-## Shared CEF
-
-Dorion can link against a system-installed CEF instead of bundling it. Relevant env vars:
-
-* `DORION_SHARED_CEF=1` skips `scripts/bundle-cef.sh`
-* `NIX_CEF_BINARY=1` (NixOS) has `cef-dll-sys` link against the CEF from the Nix environment
-* `FLATPAK=1` points `cef-dll-sys` at `/usr/lib`, matching the CEF runtime extension in the Flatpak manifest
-
-The runtime has to resolve `libcef.so` from the system install, e.g. with an rpath:
+You need [Node.js](https://nodejs.org), [pnpm](https://pnpm.io), [Rust](https://rustup.rs) 1.96+ and the [Tauri prerequisites](https://tauri.app/start/prerequisites/). On Linux you also need `cmake` and `ninja`, because the CEF wrapper is compiled during the build.
 
 ```sh
-# Fedora
-RUSTFLAGS="-C link-arg=-Wl,-rpath,/usr/lib64/cef"
+pnpm install
+pnpm shupdate          # fetch the bundled shelter fallback
+pnpm build:updater     # Windows/macOS only
+pnpm tauri build       # add: -c src-tauri/tauri.linux.conf.json on Linux
 ```
 
-CEF finds its resources (locales, paks) next to `libcef.so`, so nothing else is needed!
+The output goes to `src-tauri/target/release/`, and installers go to `bundle/`. Set `ASTRALCORD_REPO=owner/repo` when building outside GitHub Actions to enable update checks.
 
-The system CEF must, however, be **at least** the version Dorion's `cef-dll-sys` is pinned at. CEF >= 152 uses API versioning but
-older CEF requires an exact version match.
+## Notes
 
-## Flatpak
+- Some in-app settings pages are loaded from Dorion's online plugins, so they may still mention "Dorion".
+- AstralCord isn't affiliated with or endorsed by Discord or the Dorion project. Discord's Terms of Service don't allow client modifications, so use it at your own risk.
 
-The flatpak wraps the linux `.deb`, so build that first and move it into the `flatpak/` dir before building the rest:
+## License
 
-```sh
-git submodule update --init
-mkdir -p flatpak/build
-cp src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb flatpak/build/dorion-x86_64.deb
-
-flatpak-builder --force-clean --ccache --repo=flatpak/repo flatpak/out flatpak/com.spikehd.dorion.yml
-```
-
-Then install the built flatpak and run it:
-
-```sh
-flatpak --user install -y ./flatpak/repo com.spikehd.dorion
-flatpak --user run com.spikehd.dorion
-```
-
-# Known Issues
-
-* (non-Windows) External images (UserBG, Decor, UserPFP, etc.) will not load
-* (non-Windows) Fonts/font-faces will not load
-* Everything else in [the issues page](https://github.com/SpikeHD/Dorion/issues)
-
-# Troubleshooting
-
-## Things you Might be Asked to Provide
-
-If you submit an issue or ask a question in the Discord, it's likely you will be asked for the following, so please provide them if you can:
-
-* Devtools console output (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> <kbd>i</kbd>, then click "Console")
-* `latest.log` output
-  * Windows: `%appdata%\dorion\logs`
-  * Linux: `~/.config/dorion/logs`
-  * MacOS: `~/Library/Application Support/dorion/logs`
-
-## General
-
-### I can't see Dorion Settings!
-* Check if `https://raw.githubusercontent.com/` URLs are being blocked by any system-wide adblockers/firewalls
-* Check the devtools console to see if there are any relevant errors
-
-### "Oops! Something went wrong."
-(or a similar client crash)
-* Disable non-vital client mods/plugins/extensions and try again.
-* If you cannot get to the settings menu, you can delete the following items:
-  * Windows: `%appdata%\dorion\webdata` & `%appdata%\dorion\config.json`
-  * Linux: `~/.config/dorion/webdata` & `~/.config/dorion/config.json`
-  * MacOS: `~/Library/Application Support/dorion/webdata` & `~/Library/Application Support/dorion/config.json`
-
-## Windows
-### Dorion not opening
-* Try installing via MSI instead of the `.zip` file
-* Try using the `.zip` file instead of the MSI
-* (If using the `.zip` file) make sure all files were extracted properly. Ensure you are extracting Dorion and it's contents into it's own folder.
-* [Reinstall WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/)
-  * Fully uninstall and reinstall.
-  * If you are having trouble uninstalling it, or the installer says its already installed even though you uninstalled, try deleting this registry folder and uninstalling again `Computer\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}`
-
-# Using Plugins, Extensions, and Themes
-
-Plugins, extensions, and themes are relatively simple to use, the file structure looks like so on Windows:
-
-```
-C:/Users/%USERNAME%/dorion/
-    ├── plugins/
-    |   └── plugin.js
-    ├── extensions/
-    |   └── some_unpacked_extension/
-    └── themes/
-        └── theme.css
-```
-
-and like so on Linux:
-
-```
-~/.config/dorion/
-    ├── plugins/
-    |   └── plugin.js
-    └── themes/
-        └── theme.css
-```
-
-so if you download a plugin, extension, or theme, just pop it into the `plugins`/`extensions`/`themes` folder. If you need help finding them, there are buttons in Dorion settings that'll take you where you need!
-
-> [!NOTE]
-> Themes can also be installed by clicking `Install Theme from Link` in Theme settings, if you prefer
-
-# Contributing
-
-Issues, PRs, etc. are all welcome! For guidelines and tips, see [CONTRIBUTING.md](https://github.com/SpikeHD/Dorion/blob/main/CONTRIBUTING.md)
-
-## Translating
-
-See [TRANSLATING.md](./TRANSLATING.md)
-
-## Contributors
-
-<a href="https://github.com/spikehd/dorion/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=spikehd/dorion" />
-</a>
-
-# Screenshots
-
-## Full Installed Size Comparison (Windows)
-<img width="100%" src="https://github.com/SpikeHD/Dorion/assets/25207995/eb603f1f-f633-4913-a25e-1316b495a08a" />
-
-## Some Performance Settings
-<img width="100%" src="https://github.com/user-attachments/assets/a3364e03-7de2-4293-8cd7-cf655e99546f" />
-
-Theme: [OldCord](https://betterdiscord.app/theme/OldCord)
-
-<img width="100%" src="https://github.com/SpikeHD/Dorion/assets/25207995/c73a2333-31fb-404a-9489-5e1b1f8cfa54" />
-
-Theme: [Fluent](https://betterdiscord.app/theme/Fluent)
+[GPL-3.0](LICENSE), the same as Dorion. If you share builds, share the source too. This repo already does that.

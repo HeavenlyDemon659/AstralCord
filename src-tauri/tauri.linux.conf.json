@@ -10,12 +10,12 @@
     "linux": {
       "deb": {
         "files": {
-          "usr/lib/dorion": ".cef"
+          "usr/lib/astralcord": ".cef"
         }
       },
       "rpm": {
         "files": {
-          "/usr/lib/dorion": ".cef"
+          "/usr/lib/astralcord": ".cef"
         },
         "compression": {
           "type": "zstd",

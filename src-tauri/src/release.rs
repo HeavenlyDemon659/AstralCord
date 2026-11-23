@@ -4,6 +4,17 @@ use crate::log;
 use crate::util::http::async_client;
 use crate::util::paths::{config_is_local, updater_dir};
 
+/// GitHub "owner/repo" whose releases this build checks for updates.
+/// GitHub Actions builds pick it up from GITHUB_REPOSITORY automatically;
+/// set ASTRALCORD_REPO at build time to override. Empty = update checks off.
+pub const UPDATE_REPO: &str = match option_env!("ASTRALCORD_REPO") {
+  Some(repo) => repo,
+  None => match option_env!("GITHUB_REPOSITORY") {
+    Some(repo) => repo,
+    None => "",
+  },
+};
+
 #[tauri::command]
 pub async fn update_check(win: tauri::WebviewWindow<crate::Runtime>) -> Vec<String> {
   let mut to_update = vec![];
@@ -13,7 +24,7 @@ pub async fn update_check(win: tauri::WebviewWindow<crate::Runtime>) -> Vec<Stri
   let main_rel = maybe_latest_main_release(&win).await;
 
   if main_rel.is_ok() && main_rel.unwrap() {
-    log!("Available update for Dorion!");
+    log!("Available update for AstralCord!");
     to_update.push("dorion".to_string());
   }
 
@@ -68,11 +79,16 @@ pub async fn do_update(win: tauri::WebviewWindow<crate::Runtime>, to_update: Vec
 pub async fn maybe_latest_main_release(
   win: &tauri::WebviewWindow<crate::Runtime>,
 ) -> Result<bool, Box<dyn std::error::Error + Sync + Send>> {
-  let url = "https://api.github.com/repos/SpikeHD/Dorion/releases/latest";
+  if UPDATE_REPO.is_empty() {
+    log!("No update source configured for this build, skipping update check");
+    return Ok(false);
+  }
+
+  let url = format!("https://api.github.com/repos/{UPDATE_REPO}/releases/latest");
   let client = async_client();
   let response = client
-    .get(url)
-    .header("User-Agent", "Dorion")
+    .get(url.as_str())
+    .header("User-Agent", "AstralCord")
     .send()
     .await?;
   let text = response.text().await?;

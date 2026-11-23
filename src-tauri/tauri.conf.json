@@ -8,7 +8,7 @@
   "bundle": {
     "active": true,
     "category": "SocialNetworking",
-    "copyright": "",
+    "copyright": "AstralCord is a fork of Dorion by SpikeHD. GPL-3.0",
     "targets": "all",
     "externalBin": [],
     "icon": [
@@ -17,8 +17,7 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico",
-      "icons/icon.png",
-      "icons/Assets.car"
+      "icons/icon.png"
     ],
     "windows": {
       "certificateThumbprint": null,
@@ -39,7 +38,7 @@
       "extension/*",
       "updater*"
     ],
-    "shortDescription": "",
+    "shortDescription": "A tiny Rust-based Discord client",
     "linux": {
       "deb": {
         "depends": []
@@ -49,9 +48,9 @@
       }
     }
   },
-  "productName": "Dorion",
+  "productName": "AstralCord",
   "version": "7.0.1",
-  "identifier": "com.spikehd.dorion",
+  "identifier": "com.astralcord.client",
   "plugins": {
     "deep-link": {
       "desktop": {

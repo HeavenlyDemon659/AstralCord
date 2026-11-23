@@ -2,11 +2,11 @@ use pico_args::Arguments;
 use std::path::PathBuf;
 
 #[cfg(not(target_os = "linux"))]
-use crate::github::{download_release, get_release};
+use crate::github::{download_release, get_release, update_repo};
 #[cfg(not(target_os = "linux"))]
 mod github;
 
-// If you are reading this, you probably don't need to be. Dorion updates on it's own, silly!
+// If you are reading this, you probably don't need to be. AstralCord updates on it's own, silly!
 struct UpdaterArguments {
   main: bool,
   #[cfg(target_os = "windows")]
@@ -34,7 +34,7 @@ pub fn main() {
 }
 
 pub fn elevate() {
-  // This should always be run by Dorion itself, which means it will likely not have admin perms, so we request them before anything else
+  // This should always be run by AstralCord itself, which means it will likely not have admin perms, so we request them before anything else
   #[cfg(target_os = "windows")]
   reopen_as_elevated();
 
@@ -108,7 +108,15 @@ pub fn reopen_as_elevated() {
  */
 #[cfg(target_os = "windows")]
 pub fn update_main() {
-  let release = match get_release("SpikeHD", "Dorion") {
+  let (owner, repo) = match update_repo() {
+    Ok(source) => source,
+    Err(e) => {
+      println!("{}", e);
+      return;
+    }
+  };
+
+  let release = match get_release(owner, repo) {
     Ok(release) => release,
     Err(e) => {
       println!("Failed to get release: {}", e);
@@ -116,7 +124,7 @@ pub fn update_main() {
     }
   };
 
-  println!("Latest Dorion release: {}", release.tag_name);
+  println!("Latest AstralCord release: {}", release.tag_name);
 
   // Find the release that ends with ".dmg", that's the MacOS release
   let mut release_name = String::new();
@@ -133,25 +141,25 @@ pub fn update_main() {
   println!("Downloading {}...", release_name);
 
   let release_path = download_release(
-    "SpikeHD",
-    "Dorion",
+    owner,
+    repo,
     release.tag_name.clone(),
     release_name.clone(),
     path.clone(),
   );
 
-  // Kill Dorion BEFORE we install
-  println!("Attempting to kill Dorion process...");
+  // Kill AstralCord BEFORE we install
+  println!("Attempting to kill AstralCord process...");
 
   let mut cmd = std::process::Command::new("taskkill");
   cmd.arg("/F");
   cmd.arg("/IM");
-  cmd.arg("Dorion.exe");
+  cmd.arg("AstralCord.exe");
 
   match cmd.spawn() {
     Ok(mut p) => p.wait().unwrap(),
     Err(e) => {
-      println!("Failed to kill Dorion process: {}", e);
+      println!("Failed to kill AstralCord process: {}", e);
       return;
     }
   };
@@ -168,7 +176,7 @@ pub fn update_main() {
   match cmd.spawn() {
     Ok(_) => (),
     Err(e) => {
-      println!("Failed to kill Dorion process: {}", e);
+      println!("Failed to kill AstralCord process: {}", e);
     }
   };
 
@@ -178,7 +186,15 @@ pub fn update_main() {
 #[cfg(target_os = "windows")]
 pub fn update_main_kinda() {
   // Same as the MSI, but we just download the zip file instead and open explorer to highlight it
-  let release = match get_release("SpikeHD", "Dorion") {
+  let (owner, repo) = match update_repo() {
+    Ok(source) => source,
+    Err(e) => {
+      println!("{}", e);
+      return;
+    }
+  };
+
+  let release = match get_release(owner, repo) {
     Ok(release) => release,
     Err(e) => {
       println!("Failed to get release: {}", e);
@@ -186,7 +202,7 @@ pub fn update_main_kinda() {
     }
   };
 
-  println!("Latest Dorion release: {}", release.tag_name);
+  println!("Latest AstralCord release: {}", release.tag_name);
 
   // Find the release that ends with ".zip", that should be the Windows release
   let mut release_name = String::new();
@@ -203,8 +219,8 @@ pub fn update_main_kinda() {
   println!("Downloading {}...", release_name);
 
   let release_path = download_release(
-    "SpikeHD",
-    "Dorion",
+    owner,
+    repo,
     release.tag_name.clone(),
     release_name.clone(),
     path.clone(),
@@ -224,18 +240,18 @@ pub fn update_main_kinda() {
     }
   };
 
-  println!("Attempting to kill Dorion process...");
+  println!("Attempting to kill AstralCord process...");
 
-  // Also kill the main Dorion process if we can
+  // Also kill the main AstralCord process if we can
   let mut cmd = std::process::Command::new("taskkill");
   cmd.arg("/F");
   cmd.arg("/IM");
-  cmd.arg("Dorion.exe");
+  cmd.arg("AstralCord.exe");
 
   match cmd.spawn() {
     Ok(_) => (),
     Err(e) => {
-      println!("Failed to kill Dorion process: {}", e);
+      println!("Failed to kill AstralCord process: {}", e);
       return;
     }
   };
@@ -248,7 +264,15 @@ pub fn update_main_kinda() {
  */
 #[cfg(target_os = "macos")]
 pub fn update_main() {
-  let release = match get_release("SpikeHD", "Dorion") {
+  let (owner, repo) = match update_repo() {
+    Ok(source) => source,
+    Err(e) => {
+      println!("{}", e);
+      return;
+    }
+  };
+
+  let release = match get_release(owner, repo) {
     Ok(release) => release,
     Err(e) => {
       println!("Failed to get release: {}", e);
@@ -256,7 +280,7 @@ pub fn update_main() {
     }
   };
 
-  println!("Latest Dorion release: {}", release.tag_name);
+  println!("Latest AstralCord release: {}", release.tag_name);
 
   // Find the release that ends with ".dmg", that's the MacOS release
   let mut release_name = String::new();
@@ -279,8 +303,8 @@ pub fn update_main() {
   println!("Downloading {}...", release_name);
 
   let release_path = download_release(
-    "SpikeHD",
-    "Dorion",
+    owner,
+    repo,
     release.tag_name.clone(),
     release_name.clone(),
     path.clone(),
@@ -300,17 +324,17 @@ pub fn update_main() {
     }
   }
 
-  println!("Attempting to kill Dorion process...");
+  println!("Attempting to kill AstralCord process...");
 
-  // Also kill the main Dorion process if we can
+  // Also kill the main AstralCord process if we can
   let mut cmd = std::process::Command::new("pkill");
   cmd.arg("-9");
-  cmd.arg("Dorion");
+  cmd.arg("AstralCord");
 
   match cmd.spawn() {
     Ok(_) => {}
     Err(e) => {
-      println!("Failed to kill Dorion: {:?}", e);
+      println!("Failed to kill AstralCord: {:?}", e);
     }
   }
 

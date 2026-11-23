@@ -53,7 +53,7 @@ pub fn send_notification(
 
   // Then write it to a temp file
   let mut tmp_file = std::env::temp_dir();
-  tmp_file.push("dorion_notif_icon.png");
+  tmp_file.push("astralcord_notif_icon.png");
 
   let file = match std::fs::File::create(&tmp_file) {
     Ok(file) => file,
@@ -124,7 +124,7 @@ fn send_notification_internal_other(
   match Notification::new()
     .summary(&title)
     .body(&body)
-    .icon("dorion")
+    .icon("astralcord")
     .timeout(Timeout::Milliseconds(5000))
     .action("default", "default")
     .show()
@@ -153,7 +153,7 @@ fn get_winrt_icon(icon: &str) -> Option<std::path::PathBuf> {
     return Some(Path::new(icon).to_path_buf());
   }
 
-  let fallback = std::env::temp_dir().join("dorion_notification_icon.png");
+  let fallback = std::env::temp_dir().join("astralcord_notification_icon.png");
 
   match std::fs::write(&fallback, include_bytes!("../../icons/icon.png")) {
     Ok(()) => Some(fallback),

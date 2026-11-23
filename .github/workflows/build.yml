@@ -1,23 +1,17 @@
-name: Build
+name: Build AstralCord
+
+# Every push to main builds AstralCord for Linux and Windows, then publishes the
+# files as a GitHub Release named after the version in src-tauri/tauri.conf.json
+# (e.g. v7.0.1). Pushing again with the same version replaces that release's files.
 
 on:
   workflow_dispatch:
   push:
-    paths:
-      - '.github/workflows/build.yml'
-      - 'package.json'
-      - 'src-tauri/**/*'
-      - 'src/**/*'
-      - 'updater/**/*'
     branches:
       - main
-  pull_request:
-    paths:
-      - '.github/workflows/build.yml'
-      - 'package.json'
-      - 'src-tauri/**/*'
-      - 'src/**/*'
-      - 'updater/**/*'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -26,300 +20,140 @@ concurrency:
 env:
   CARGO_INCREMENTAL: 0
   GIT_HASH: ${{ github.sha }}
+  # The app and its updater check this repo's Releases for new versions
+  # (see src-tauri/src/release.rs and updater/src/github.rs).
+  ASTRALCORD_REPO: ${{ github.repository }}
 
 jobs:
-  build:
-    name: Build (${{ matrix.config.target }})
-    runs-on: ${{ matrix.config.platform }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - platform: ubuntu-22.04
-            target: 'x86_64-unknown-linux-gnu'
-          - platform: ubuntu-22.04
-            target: 'aarch64-unknown-linux-gnu'
-
-          - platform: macos-latest
-            target: 'x86_64-apple-darwin'
-          - platform: macos-latest
-            target: 'aarch64-apple-darwin'
-
-          - platform: windows-latest
-            target: 'x86_64-pc-windows-msvc'
-          - platform: windows-latest
-            target: 'aarch64-pc-windows-msvc'
-
+  linux:
+    name: Linux (x86_64)
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-build
         with:
-          target: ${{ matrix.config.target }}
+          target: x86_64-unknown-linux-gnu
 
-      - name: (Non-Linux) Build updater
-        if: matrix.config.platform != 'ubuntu-22.04'
-        run: pnpm build:updater
-        env:
-          RUSTFLAGS: -Awarnings
-
-      - name: Install dependencies
+      - name: Install JS dependencies
         run: pnpm install && pnpm shupdate
 
-      - name: Compile
-        if: matrix.config.platform != 'ubuntu-22.04'
-        run: pnpm tauri build --no-bundle --target ${{ matrix.config.target }}
+      # Compiles the app (downloading the CEF/Chromium runtime it needs for voice),
+      # stages CEF via scripts/bundle-cef.sh, then packages the .deb.
+      - name: Build app and .deb
+        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json --bundles deb --target x86_64-unknown-linux-gnu -- --config target.x86_64-unknown-linux-gnu.linker=\'x86_64-linux-gnu-gcc\'
         env:
-          RUSTFLAGS: -Awarnings
+          RUSTFLAGS: -Awarnings -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/astralcord
 
-      - name: (Linux) (x86_64) Compile
-        if: matrix.config.target == 'x86_64-unknown-linux-gnu'
-        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json --no-bundle --target ${{ matrix.config.target }} -- --config target.x86_64-unknown-linux-gnu.linker=\'x86_64-linux-gnu-gcc\'
-        env:
-          RUSTFLAGS: -Awarnings -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/dorion
-
-      - name: (Linux) (ARM64) Compile
-        if: matrix.config.target == 'aarch64-unknown-linux-gnu'
-        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json --no-bundle --target ${{ matrix.config.target }} -- --config target.aarch64-unknown-linux-gnu.linker=\'aarch64-linux-gnu-gcc\'
-        env:
-          RUSTFLAGS: -Awarnings -L/usr/lib/aarch64-linux-gnu -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/dorion
-          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
-          PKG_CONFIG_SYSROOT_DIR: /usr/lib/aarch64-linux-gnu
-          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
-          ZSTD_SYS_USE_PKG_CONFIG: 1
-          ZSTD_SYS_NO_VENDOR: 1
-
-      - name: (Linux) Stage CEF
-        if: matrix.config.platform == 'ubuntu-22.04'
-        run: bash scripts/bundle-cef.sh
-
-      # Make empty folders for plugins and themes
-      - name: (Windows) Create empty folders for plugins
-        if: matrix.config.platform == 'windows-latest'
-        continue-on-error: true
-        run: mkdir src-tauri/target/${{ matrix.config.target }}/release/themes && mkdir src-tauri/target/${{ matrix.config.target }}/release/plugins
-
-      # Empty folders, unix edition
-      - name: (Unix) Create empty folders for plugins and themes
-        if: matrix.config.platform != 'windows-latest'
-        run: mkdir -p src-tauri/target/${{ matrix.config.target }}/release/plugins && mkdir -p src-tauri/target/${{ matrix.config.target }}/release/themes
-
-      - name: Create .portable file for portable builds
-        run: cd src-tauri/target/${{ matrix.config.target }}/release && touch .portable
-
-      - name: (Windows) Compress build
-        if: matrix.config.platform == 'windows-latest'
-        run: cd src-tauri/target/${{ matrix.config.target }}/release && 7z a -tzip -mx9 Dorion.zip
-          Dorion.exe
-          updater.exe
-          .portable
-          plugins/
-          themes/
-          icons/
-          injection/
-          extension/
-
-      - name: (Linux) Compress build
-        if: matrix.config.platform == 'ubuntu-22.04'
+      - name: Package portable .tar.gz
         run: |
-          cd src-tauri/target/${{ matrix.config.target }}/release
+          [ -f src-tauri/.cef/libcef.so ] || bash scripts/bundle-cef.sh
+          cd src-tauri/target/x86_64-unknown-linux-gnu/release
+          mkdir -p plugins themes
+          touch .portable
           rm -rf locales
           cp -af ../../../.cef/. .
-          tar -czvf dorion.tar.gz Dorion .portable ./plugins ./themes ./injection ./icons libcef.so libEGL.so libGLESv2.so chrome_100_percent.pak chrome_200_percent.pak resources.pak icudtl.dat v8_context_snapshot.bin chrome-sandbox locales
+          tar -czvf AstralCord_linux_x64_portable.tar.gz AstralCord .portable ./plugins ./themes ./injection ./icons libcef.so libEGL.so libGLESv2.so chrome_100_percent.pak chrome_200_percent.pak resources.pak icudtl.dat v8_context_snapshot.bin chrome-sandbox locales
 
-      # Windows portable
-      - name: (Windows) Upload portable
-        if: matrix.config.platform == 'windows-latest'
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
-          name: dorion-${{ matrix.config.target }}-portable
-          path: src-tauri/target/${{ matrix.config.target }}/release/Dorion.zip
+          name: linux-portable
+          path: src-tauri/target/x86_64-unknown-linux-gnu/release/AstralCord_linux_x64_portable.tar.gz
 
-      # Ubuntu portable
-      - name: (Linux) Upload portable
-        if: matrix.config.platform == 'ubuntu-22.04'
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
-          name: dorion-${{ matrix.config.target }}-portable
-          path: src-tauri/target/${{ matrix.config.target }}/release/dorion.tar.gz
+          name: linux-deb
+          path: src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb
 
-  # Package jobs
-  bundle-linux-deb:
-    needs: build
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ['x86_64-unknown-linux-gnu', 'aarch64-unknown-linux-gnu']
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-build
-        with:
-          target: ${{ matrix.target }}
-
-      - run: pnpm install
-
-      - name: Package .deb (x86_64)
-        if: matrix.target == 'x86_64-unknown-linux-gnu'
-        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json -c '{"build":{"beforeBuildCommand":""}}' --bundles deb --target ${{ matrix.target }} -- --config target.x86_64-unknown-linux-gnu.linker=\'x86_64-linux-gnu-gcc\'
-        env:
-          RUSTFLAGS: -Awarnings -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/dorion
-
-      - name: Package .deb (ARM64)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json -c '{"build":{"beforeBuildCommand":""}}' --bundles deb --target ${{ matrix.target }} -- --config target.aarch64-unknown-linux-gnu.linker=\'aarch64-linux-gnu-gcc\'
-        env:
-          RUSTFLAGS: -Awarnings -L/usr/lib/aarch64-linux-gnu -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/dorion
-          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
-          PKG_CONFIG_SYSROOT_DIR: /usr/lib/aarch64-linux-gnu
-          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
-          ZSTD_SYS_USE_PKG_CONFIG: 1
-          ZSTD_SYS_NO_VENDOR: 1
-
-      - name: Upload .deb
-        uses: actions/upload-artifact@v7
-        with:
-          name: dorion-${{ matrix.target }}-deb
-          path: src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
-
-  bundle-linux-rpm:
-    needs: build
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ['x86_64-unknown-linux-gnu', 'aarch64-unknown-linux-gnu']
-    steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-build
-        with:
-          target: ${{ matrix.target }}
-
-      - run: pnpm install
-
-      - name: Use system CEF in the RPM config
-        # json_patch merge deletes keys set to null
-        run: jq '.bundle.linux.rpm.files = null | .bundle.linux.rpm.depends = ["cef"]' src-tauri/tauri.linux.conf.json > shared-cef.json
-
-      - name: Package .rpm (x86_64)
-        if: matrix.target == 'x86_64-unknown-linux-gnu'
-        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json -c shared-cef.json --bundles rpm --target ${{ matrix.target }} -- --config target.x86_64-unknown-linux-gnu.linker=\'x86_64-linux-gnu-gcc\'
-        env:
-          DORION_SHARED_CEF: 1
-          # RUSTFLAGS overrides .cargo/config.toml, so repeat the rpaths
-          RUSTFLAGS: -Awarnings -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/dorion -C link-arg=-Wl,-rpath,/usr/lib64/cef
-
-      - name: Package .rpm (ARM64)
-        if: matrix.target == 'aarch64-unknown-linux-gnu'
-        run: pnpm tauri build -c src-tauri/tauri.linux.conf.json -c shared-cef.json --bundles rpm --target ${{ matrix.target }} -- --config target.aarch64-unknown-linux-gnu.linker=\'aarch64-linux-gnu-gcc\'
-        env:
-          DORION_SHARED_CEF: 1
-          RUSTFLAGS: -Awarnings -L/usr/lib/aarch64-linux-gnu -C link-arg=-Wl,--disable-new-dtags -C link-arg=-Wl,-rpath,$ORIGIN -C link-arg=-Wl,-rpath,$ORIGIN/../lib/dorion -C link-arg=-Wl,-rpath,/usr/lib64/cef
-          CC_aarch64_unknown_linux_gnu: aarch64-linux-gnu-gcc
-          PKG_CONFIG_SYSROOT_DIR: /usr/lib/aarch64-linux-gnu
-          PKG_CONFIG_PATH: /usr/lib/aarch64-linux-gnu/pkgconfig
-          ZSTD_SYS_USE_PKG_CONFIG: 1
-          ZSTD_SYS_NO_VENDOR: 1
-
-      - name: Upload .rpm
-        uses: actions/upload-artifact@v7
-        with:
-          name: dorion-${{ matrix.target }}-rpm
-          path: src-tauri/target/${{ matrix.target }}/release/bundle/rpm/*.rpm
-
-  bundle-windows:
-    needs: build
+  windows:
+    name: Windows (x64)
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        bundle: [msi, nsis]
-        target: ['x86_64-pc-windows-msvc', 'aarch64-pc-windows-msvc']
-        # Windows ARM only supports NSIS right now, but we should keep the MSI
-        # for x86_64, a buncha package managers will explode otherwise
-        exclude:
-          - bundle: msi
-            target: aarch64-pc-windows-msvc
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-build
         with:
-          target: ${{ matrix.target }}
+          target: x86_64-pc-windows-msvc
 
-      - run: pnpm install
+      - name: Install JS dependencies
+        run: pnpm install && pnpm shupdate
 
       - name: Build updater
         run: pnpm build:updater
         env:
           RUSTFLAGS: -Awarnings
 
-      - name: Package ${{ matrix.bundle }}
+      - name: Build app and installers
+        run: pnpm tauri build --bundles nsis,msi --target x86_64-pc-windows-msvc
+        env:
+          RUSTFLAGS: -Awarnings
+
+      - name: Package portable .zip
         shell: bash
-        run: pnpm tauri build -c '{"build":{"beforeBuildCommand":""}}' --bundles ${{ matrix.bundle }} --target ${{ matrix.target }}
-        env:
-          RUSTFLAGS: -Awarnings
+        run: |
+          cd src-tauri/target/x86_64-pc-windows-msvc/release
+          mkdir -p plugins themes
+          touch .portable
+          7z a -tzip -mx9 AstralCord_win64_portable.zip AstralCord.exe updater.exe .portable plugins/ themes/ icons/ injection/ extension/
 
-      - name: Upload bundle
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
-          name: dorion-${{ matrix.target }}-${{ matrix.bundle }}
-          path: src-tauri/target/${{ matrix.target }}/release/bundle/${{ matrix.bundle }}/*
+          name: windows-portable
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/AstralCord_win64_portable.zip
 
-  bundle-macos:
-    needs: build
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ['x86_64-apple-darwin', 'aarch64-apple-darwin']
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-nsis
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows-msi
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+
+  release:
+    name: Publish GitHub Release
+    needs: [linux, windows]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/setup-build
-        with:
-          target: ${{ matrix.target }}
-
-      - run: pnpm install
-
-      - name: Build updater
-        run: pnpm build:updater
-        env:
-          RUSTFLAGS: -Awarnings
-
-      - name: Package .dmg
-        run: pnpm tauri build -c '{"build":{"beforeBuildCommand":""}}' --bundles dmg --target ${{ matrix.target }}
-        env:
-          RUSTFLAGS: -Awarnings
-
-      - name: Upload .dmg
-        uses: actions/upload-artifact@v7
-        with:
-          name: dorion-${{ matrix.target }}-dmg
-          path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
-
-  flatpak:
-    # Flatpak just needs the deb to extract
-    needs: bundle-linux-deb
-    runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
-      options: --privileged
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          submodules: recursive
 
       - uses: actions/download-artifact@v8
         with:
-          name: dorion-x86_64-unknown-linux-gnu-deb
-          path: flatpak/build
+          path: artifacts
 
-      - name: (Flatpak) Stage the deb
-        run: mv flatpak/build/*.deb flatpak/build/dorion-x86_64.deb
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          V=$(jq -r .version src-tauri/tauri.conf.json)
+          TAG="v$V"
+          mkdir out
+          cp artifacts/windows-nsis/*.exe        "out/AstralCord_${V}_x64-setup.exe"
+          cp artifacts/windows-msi/*.msi         "out/AstralCord_${V}_x64_en-US.msi"
+          cp artifacts/windows-portable/*.zip    "out/AstralCord_${V}_win64_portable.zip"
+          cp artifacts/linux-portable/*.tar.gz   "out/AstralCord_${V}_linux_x64_portable.tar.gz"
+          cp artifacts/linux-deb/*.deb           "out/AstralCord_${V}_amd64.deb"
+          ls -la out
 
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-        with:
-          bundle: com.spikehd.dorion.flatpak
-          manifest-path: flatpak/com.spikehd.dorion.yml
-          cache: false
-          upload-artifact: true
-          artifact-name: dorion-x86_64-unknown-linux-gnu-flatpak
+          cat > notes.md <<EOF
+          Built from ${GITHUB_SHA::7}.
+
+          **Windows 10/11**
+          - \`AstralCord_${V}_x64-setup.exe\` (installer, recommended)
+          - \`AstralCord_${V}_x64_en-US.msi\` (MSI installer)
+          - \`AstralCord_${V}_win64_portable.zip\` (no install: unzip and run \`AstralCord.exe\`)
+
+          **Linux (x86_64)**
+          - \`AstralCord_${V}_linux_x64_portable.tar.gz\` (any distro, including Arch: extract and run \`./AstralCord\`)
+          - \`AstralCord_${V}_amd64.deb\` (Debian/Ubuntu/Mint)
+
+          AstralCord is a fork of [Dorion](https://github.com/SpikeHD/Dorion) by SpikeHD, licensed under GPL-3.0.
+          EOF
+
+          # One release per version: replace it if this version was already published.
+          gh release delete "$TAG" --cleanup-tag --yes 2>/dev/null || true
+          gh release create "$TAG" out/* --title "AstralCord $TAG" --notes-file notes.md --target "$GITHUB_SHA" --latest

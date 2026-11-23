@@ -39,7 +39,7 @@ pub fn get_config_dir() -> PathBuf {
   #[cfg(not(target_os = "windows"))]
   let appdata = dirs::config_dir().unwrap_or_default();
 
-  let config_dir = appdata.join("dorion");
+  let config_dir = appdata.join("astralcord");
 
   create_if_not_exists(&config_dir);
 
@@ -84,13 +84,13 @@ pub fn get_plugin_dir() -> std::path::PathBuf {
   #[cfg(target_os = "windows")]
   let plugin_dir = dirs::home_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("plugins");
 
   #[cfg(not(target_os = "windows"))]
   let plugin_dir = dirs::config_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("plugins");
 
   create_if_not_exists(&plugin_dir);
@@ -113,13 +113,13 @@ pub fn get_theme_dir() -> std::path::PathBuf {
   #[cfg(target_os = "windows")]
   let theme_dir = dirs::home_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("themes");
 
   #[cfg(not(target_os = "windows"))]
   let theme_dir = dirs::config_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("themes");
 
   create_if_not_exists(&theme_dir);
@@ -147,13 +147,13 @@ pub fn get_extensions_dir() -> PathBuf {
   #[cfg(target_os = "windows")]
   let extensions_dir = dirs::home_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("extensions");
 
   #[cfg(not(target_os = "windows"))]
   let extensions_dir = dirs::config_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("extensions");
 
   create_if_not_exists(&extensions_dir);
@@ -180,7 +180,7 @@ pub fn get_main_extension_path() -> PathBuf {
   #[cfg(not(target_os = "windows"))]
   let appdata = dirs::config_dir().unwrap_or_default();
 
-  let extension_dir = appdata.join("dorion").join("extension");
+  let extension_dir = appdata.join("astralcord").join("extension");
 
   create_if_not_exists(&extension_dir);
 
@@ -202,7 +202,7 @@ pub fn profiles_dir() -> PathBuf {
   // This is created automatically
   dirs::data_dir()
     .unwrap_or_default()
-    .join("dorion")
+    .join("astralcord")
     .join("profiles")
 }
 
@@ -237,9 +237,9 @@ pub fn get_cef_data_dir() -> PathBuf {
   // Chromium profile names must be a single path component under the cache root
   let dir = dirs::cache_dir()
     .unwrap_or_else(std::env::temp_dir)
-    .join("com.spikehd.dorion")
+    .join("com.astralcord.client")
     .join("cef")
-    .join(format!("dorion-{}", profile));
+    .join(format!("astralcord-{}", profile));
 
   create_if_not_exists(&dir);
 
@@ -277,7 +277,7 @@ pub fn custom_detectables_path() -> PathBuf {
   #[cfg(not(target_os = "windows"))]
   let appdata = dirs::config_dir().unwrap_or_default();
 
-  appdata.join("dorion").join("detectables.json")
+  appdata.join("astralcord").join("detectables.json")
 }
 
 pub fn log_file_path() -> PathBuf {
@@ -298,5 +298,5 @@ pub fn log_file_path() -> PathBuf {
   #[cfg(not(target_os = "windows"))]
   let appdata = dirs::config_dir().unwrap_or_default();
 
-  appdata.join("dorion").join("logs").join("latest.log")
+  appdata.join("astralcord").join("logs").join("latest.log")
 }
