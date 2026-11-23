@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AstralCord
+Comment=Experimental unofficial native Discord client
+Exec=astralcord
+Icon=astralcord
+StartupWMClass=com.astralcord.client
+Terminal=false
+Categories=Network;InstantMessaging;

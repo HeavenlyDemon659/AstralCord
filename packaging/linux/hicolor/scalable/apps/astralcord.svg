@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="160" y1="900" x2="880" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1A1240"/>
+      <stop offset="0.55" stop-color="#4A2DB5"/>
+      <stop offset="1" stop-color="#8E63F7"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="512" cy="512" r="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#D3C6FF" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#D3C6FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="star" x1="512" y1="190" x2="512" y2="834" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E6E0FF"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="496" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="340" fill="url(#glow)"/>
+  <ellipse cx="512" cy="512" rx="388" ry="140" transform="rotate(-28 512 512)" fill="none" stroke="#FFFFFF" stroke-opacity="0.38" stroke-width="30"/>
+  <path d="M512 186 C540 420 604 484 838 512 C604 540 540 604 512 838 C484 604 420 540 186 512 C420 484 484 420 512 186 Z" fill="url(#star)"/>
+  <path d="M735 124 C746 168 753 179 801 190 C753 201 746 212 735 256 C724 212 717 201 669 190 C717 179 724 168 735 124 Z" fill="#FFFFFF"/>
+  <circle cx="280" cy="764" r="26" fill="#FFFFFF" fill-opacity="0.85"/>
+  <circle cx="246" cy="300" r="16" fill="#FFFFFF" fill-opacity="0.6"/>
+</svg>

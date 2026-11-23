@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Simplified mark for tiny sizes (tray, 16-48px): no orbit or dust, bolder star. -->
+  <defs>
+    <linearGradient id="bg" x1="160" y1="900" x2="880" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22175A"/>
+      <stop offset="0.55" stop-color="#5233C4"/>
+      <stop offset="1" stop-color="#9468F8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="500" fill="url(#bg)"/>
+  <path d="M512 150 C548 412 612 476 874 512 C612 548 548 612 512 874 C476 612 412 548 150 512 C412 476 476 412 512 150 Z" fill="#FFFFFF"/>
+</svg>

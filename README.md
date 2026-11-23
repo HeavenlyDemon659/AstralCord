@@ -1,65 +1,105 @@
 <div align="center">
-  <img src="src-tauri/icons/icon.png" width="128" alt="AstralCord logo">
+  <img src="packaging/linux/hicolor/256x256/apps/astralcord.png" width="128" alt="AstralCord logo">
   <h1>AstralCord</h1>
-  <p>A tiny, Rust-based Discord client for Linux and Windows.</p>
+  <p>A fast, native Discord client written in Rust, for Windows and Linux.</p>
 </div>
 
-AstralCord runs Discord's own web app inside a lightweight native shell written in Rust with [Tauri](https://tauri.app). It's far smaller than the official client, and it supports:
+AstralCord is a native desktop client built with Rust, [egui](https://github.com/emilk/egui) and
+[wgpu](https://wgpu.rs). There's no Electron and no web wrapper, so it starts quickly and uses
+little memory. It supports:
 
-- Voice and video calls
-- Themes, plus plugins via shelter, Vencord and Equicord
-- Rich Presence and push-to-talk
-- A tray icon and multiple profiles
+- Servers, DMs and threads
+- Voice and video calls, including screen share and noise suppression
+- Themes and extensions
+- A tray icon and global push-to-talk
 
-AstralCord is a renamed fork of [Dorion](https://github.com/SpikeHD/Dorion) by SpikeHD. All the clever parts are theirs.
+AstralCord is a renamed build of [Serein](https://github.com/ViceVerse-cz/Serein) by ViceVerse-cz
+and contributors. All the hard work is theirs. Serein's full documentation is in
+[`docs/serein-README.md`](docs/serein-README.md) and [`docs/`](docs/).
+
+> [!WARNING]
+> **Unofficial and not endorsed by Discord.** Like Serein, AstralCord talks to Discord's servers
+> directly with your account. Discord's Terms of Service don't allow this, and accounts can be
+> terminated for it. Use it at your own risk, ideally not on an account you can't afford to lose.
 
 ## Download
 
-Get the latest build from this repo's **Releases** page:
+Open this repo's **Releases** page and grab the newest release marked **Pre-release**
+(`v1.0.0-nightly.…`):
 
 | Platform | File | How to run |
 |---|---|---|
-| Windows 10/11 | `AstralCord_<version>_x64-setup.exe` | Run the installer |
-| Windows (no install) | `AstralCord_<version>_win64_portable.zip` | Unzip it and run `AstralCord.exe` |
-| Linux, any distro (Arch, Fedora, ...) | `AstralCord_<version>_linux_x64_portable.tar.gz` | Extract it and run `./AstralCord` |
-| Debian / Ubuntu / Mint | `AstralCord_<version>_amd64.deb` | `sudo apt install ./AstralCord_<version>_amd64.deb` |
+| Windows 10/11 | `astralcord-…-Windows-X64-Setup.exe` | Run the installer (no admin needed) |
+| Windows, no install | `astralcord-…-Windows-X64.zip` | Unzip it and run `astralcord.exe` |
+| Linux, any distro | `astralcord-…-Linux-X64.AppImage` | `chmod +x` it, then run it |
 
-Windows uses Microsoft Edge WebView2, which is already part of Windows 10/11. The Linux build bundles its own Chromium (CEF) runtime, which is what makes voice calls work.
+### Linux AppImage requirements
 
-Settings are stored in:
+The AppImage uses GTK 4 and WebKitGTK 6.0 from your system, plus Vulkan for drawing. Install them once.
 
-- `%APPDATA%\astralcord` on Windows
-- `~/.config/astralcord` on Linux
-
-Portable builds keep everything next to the program instead.
-
-## How builds work
-
-Every push to `main` runs [`.github/workflows/build.yml`](.github/workflows/build.yml) on GitHub Actions:
-
-1. It builds Linux and Windows in parallel.
-2. It publishes the files as a Release named after the version in `src-tauri/tauri.conf.json` (for example `v7.0.1`).
-
-To ship an update, bump `version` in `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`, then push. Installed copies check this repo's Releases for new versions.
-
-## Building locally
-
-You need [Node.js](https://nodejs.org), [pnpm](https://pnpm.io), [Rust](https://rustup.rs) 1.96+ and the [Tauri prerequisites](https://tauri.app/start/prerequisites/). On Linux you also need `cmake` and `ninja`, because the CEF wrapper is compiled during the build.
+On **Arch, Garuda or Manjaro**:
 
 ```sh
-pnpm install
-pnpm shupdate          # fetch the bundled shelter fallback
-pnpm build:updater     # Windows/macOS only
-pnpm tauri build       # add: -c src-tauri/tauri.linux.conf.json on Linux
+sudo pacman -S --needed gtk4 webkitgtk-6.0 vulkan-icd-loader libpulse alsa-lib gst-plugins-base-libs fuse3
 ```
 
-The output goes to `src-tauri/target/release/`, and installers go to `bundle/`. Set `ASTRALCORD_REPO=owner/repo` when building outside GitHub Actions to enable update checks.
+On **Ubuntu 24.04+ or Debian**:
 
-## Notes
+```sh
+sudo apt install libgtk-4-1 libwebkitgtk-6.0-4 libvulkan1 libpulse0 libasound2t64 \
+  libgstreamer-plugins-base1.0-0 fuse3
+```
 
-- Some in-app settings pages are loaded from Dorion's online plugins, so they may still mention "Dorion".
-- AstralCord isn't affiliated with or endorsed by Discord or the Dorion project. Discord's Terms of Service don't allow client modifications, so use it at your own risk.
+Saved logins go to your desktop's keyring (GNOME Keyring or KWallet) when one is running.
+Otherwise AstralCord keeps them in a private file in its data folder.
+
+## Updates
+
+AstralCord updates itself from this repo's releases (**Settings → Updates**). This works for the
+Windows installer, the Windows zip and the AppImage. Every push to `main` builds a new release
+automatically.
+
+## Where your data lives
+
+- Windows: `%LOCALAPPDATA%\astralcord`
+- Linux: `~/.local/share/astralcord`
+
+## How it's built
+
+[`.github/workflows/build.yml`](.github/workflows/build.yml) runs on GitHub Actions for every push
+to `main`:
+
+1. It builds the Windows installer and zip.
+2. It builds the Linux AppImage in parallel.
+3. It publishes them, with checksums, as a pre-release tagged `v1.0.0-nightly.<date>.<run>`.
+
+To build locally, follow Serein's instructions in [`docs/serein-README.md`](docs/serein-README.md).
+The pinned toolchain is Rust 1.99.1. Run `cargo xtask package` on Windows, or
+`cargo xtask package --format appimage` on Linux.
+
+### Picking up new Serein versions
+
+The rename is done by a script, so the code can be refreshed from upstream at any time:
+
+```sh
+git rm -rq . && git clean -fdxq                                    # empty the tree
+git -C /path/to/Serein archive HEAD | tar -x && git add -A          # new Serein snapshot
+git checkout HEAD -- tools/astralcord .github/workflows/build.yml   # AstralCord's own files
+python3 tools/astralcord/rebrand.py && python3 tools/astralcord/icons.py
+git checkout HEAD -- README.md assets/brand/README.md               # AstralCord's docs
+```
+
+Then commit and push, and a new build is released.
+
+[`tools/astralcord/rebrand.py`](tools/astralcord/rebrand.py) explains what it changes and what it
+deliberately leaves alone. Internal names such as the `.serein-extension` format stay the same, so
+Serein's extensions and extension catalog keep working.
+
+Serein's other packaging (Flatpak, Nix, AUR, distro repositories, macOS) is left as upstream
+shipped it and isn't built for AstralCord.
 
 ## License
 
-[GPL-3.0](LICENSE), the same as Dorion. If you share builds, share the source too. This repo already does that.
+Like Serein, AstralCord is available under either the [MIT](LICENSE-MIT) or the
+[Apache 2.0](LICENSE-APACHE) license, at your option. Third-party notices are in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

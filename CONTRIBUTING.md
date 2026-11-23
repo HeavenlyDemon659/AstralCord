@@ -1,67 +1,43 @@
 # Contributing
 
-Thank you for considering working on Dorion! There are only a couple things to keep in mind, as well as some tips to make development quick.
+Read AGENTS.md and the documentation first, including the final owner-approved webview and local-storage changes. Build with the pinned toolchain and committed Cargo.lock.
 
-## Guidelines for Pull Requests
+Run `cargo xtask check`, `node tests/login-handoff.cjs`, and `cargo replay`. Default tests must be synthetic/offline; SQLite tests use temporary disposable data. Never put actual Discord credentials into tests, CI, screenshots or reports. Keep the normal-user live gate manual and owner-controlled.
 
-* Ensure pull requests only change one feature or "thing". Do not put 6 different bug fixes into one PR, for example.
-* Describe what your pull request does in some amount of detail. No need to write an essay, but knowing what it does at a glance is helpful to me and others.
-* For pull requests that also require a change in [shelter-plugins](https://github.com/SpikeHD/shelter-plugins), link that pull request in your PR to Dorion
+Keep UI, model, protocol, storage and transport boundaries clear. Bound item counts and bytes, propagate explicit errors, preserve unrelated work, and document untested behavior. Changes to authentication, local storage or native dependencies must update the corresponding docs and risk notes. Original contributions use MIT OR Apache-2.0.
 
-## Working with Dorion
+For dependency changes, install `cargo-deny` with
+`cargo install cargo-deny --version 0.20.2 --locked`, fetch sources with `cargo fetch --locked`,
+also run `cargo fetch --locked --manifest-path fuzz/Cargo.toml`,
+then run `cargo xtask licenses` and `node tests/license-policy.cjs`. CI runs these separately
+from native builds. The offline check covers all features and platforms in the locked graph,
+including development and vendored dependencies. License findings fail the dedicated license CI job, independently of packaging; version-specific
+exceptions in `deny.toml` require source/notice review when upgraded. This checks declared license
+policy, not complete per-artifact license-text assembly or external system-library obligations.
 
-Dorion as a whole is only two components, the main stuff (this repo), and [shelter-plugins](https://github.com/SpikeHD/shelter-plugins). My shelter-plugins control things like the settings menu, and complex patches to things like Discords internals.
+Run `cargo xtask fuzz` for bounded, offline, coverage-guided decoder/state smoke tests after
+installing the pinned development tools described in [fuzz/README.md](fuzz/README.md).
+Fuzzing uses its own lockfile and nightly toolchain; normal application builds remain stable.
 
-Jump to:
-* [Set up Dorion to think the debug version is portable](#set-up-Dorion-to-think-the-debug-version-is-portable)
-* [Testing changes in Dorion](#testing-changes-in-dorion)
-* [Testing changes in the updater](#testing-changes-in-the-updater)
-* [Testing changes in Shelter Plugins](#testing-changes-in-shelter-plugins)
+Agent implementation requests follow the [idea-to-PR contract](AGENTS.md) and the
+[delivery skill](.agents/skills/serein-delivery/SKILL.md). Native UI changes include synthetic
+before/after screenshots; runtime changes include comparable release performance evidence.
+Use the PR template and leave blocked checks/evidence visible in a draft. Do not merge automatically.
 
-### Set up Dorion to think the debug version is portable
 
-It might be easiest to set up `pnpm tauri dev` to actually think that it is portable. This way, everything up to the config is seperated from your actual installation (if you have one),
-and all contained in the `./src-tauri/target/debug` folder, instead of all over your system.
+Use a separate Cargo target directory for each worktree (the default `target/` already does
+this). If `CARGO_TARGET_DIR` moves builds to another drive, give each worktree its own path;
+sharing one directory can reuse stale application/test artifacts across simultaneous edits.
+`xtask` resolves the invocation's Cargo workspace at runtime, including nested working
+directories, instead of embedding the checkout where its cached executable was compiled.
+After `cargo xtask check`, `node tests/xtask-workspace.cjs` checks that behavior without
+building or accessing an owner session.
 
-To do this, run `./setup_portable_debug.sh` or `./setup_portable_debug.cmd` on Windows. You may need to `chmod +x` it first. 
 
-### Testing changes in Dorion
-
-1. Ensure Dorion is not running already (since it will just focus that window otherwise)
-2. Start in dev mode
-   ```sh
-   pnpm tauri dev
-   ```
-
-That's it! You'll see all sorts of logs spit out, and you can test your changes.
-
-### Testing changes in the updater
-
-1. Ensure Dorion is not running already (since it will just focus that window otherwise)
-2. Build the updater
-   ```sh
-   pnpm build:updater
-   ```
-
-From here, you can test your changes in two ways:
-* Let Dorion run the updater. Good for testing how the frontend and backend communicate
-* Run the updater from CLI:
-  ```sh
-  # Just and example
-  ./updater -arg1
-  ```
-
-### Testing changes in shelter-plugins
-
-Since my [shelter-plugins](https://github.com/SpikeHD/shelter-plugins) are an entirely seperate Dorion component, you will also need to clone and build them. To do so is simple:
-
-1. Clone, install dependencies, and change whatever you need to in shelter-plugins
-2. Build them
-   ```sh
-   pnpm lune ci
-   ```
-3. Setup Dorion debug to [think it's portable](#set-up-Dorion-to-think-the-debug-version-is-portable) (if desired)
-4. Start Dorion like [above](#testing-changes-in-dorion)
-5. Disable Dorion plugin in "Performance & Extras"
-6. Copy the contents of whichever plugin you're testing via `./dist/plugins/plugin.js` into the Shelter "Add Plugin" menu. Remember to disable the default version
-of whichever you are testing, if needed.
+Run `cargo replay --soak 120` for sustained offline lifecycle pressure (default 60 seconds,
+accepted range 1..3600). The workload generates one bounded history page/live event at a time
+across 32 synthetic DMs, exercises row/byte eviction, edit/delete races, stale requests,
+reconnect/resync and logout, and asserts the shipping reducer budgets. It keeps fixed-size
+counters and ranges instead of retaining a trace. CI runs a five-second smoke; longer local
+runs are needed for sustained evidence. Output reports actual duration, visits and logout
+cycles. This is a core-only workload: no Discord traffic, storage, GUI, image or audio devices.

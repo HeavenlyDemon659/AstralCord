@@ -1,2 +1,8 @@
-blank_issues_enabled: true
-contact_links: []
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Community Server
+    url: https://discord.gg/UqTDGCENaN
+    about: Join the AstralCord community Discord server for questions, discussions, and troubleshooting.
+  - name: Documentation & Architecture
+    url: https://github.com/HeavenlyDemon659/AstralCord#readme
+    about: Consult the README, Discord compatibility matrix, and platform support guides.

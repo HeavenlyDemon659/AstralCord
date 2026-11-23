@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
+  <title>AstralCord symbolic icon</title>
+  <style id="current-color-scheme" type="text/css">.ColorScheme-Text { color: #bebebe; }</style>
+  <g transform="translate(512 512) scale(1.15) translate(-512 -512)">
+    <path d="M512 150 C548 412 612 476 874 512 C612 548 548 612 512 874 C476 612 412 548 150 512 C412 476 476 412 512 150 Z" fill="currentColor" class="ColorScheme-Text"/>
+  </g>
+</svg>
