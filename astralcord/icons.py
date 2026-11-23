@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Regenerate every AstralCord icon from the masters in tools/astralcord/art/.
+"""Regenerate every AstralCord icon from the masters in astralcord/art/.
 
-    python3 tools/astralcord/icons.py      # needs rsvg-convert and Pillow
+    python3 astralcord/icons.py      # needs rsvg-convert and Pillow
 
 Writes the files Serein ships its own artwork in (upstream file names are kept where code or
 packaging refers to them):
@@ -23,8 +23,8 @@ import subprocess
 
 from PIL import Image
 
-ROOT = pathlib.Path(__file__).resolve().parents[2]
-ART = ROOT / "tools/astralcord/art"
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+ART = ROOT / "astralcord/art"
 FULL = (ART / "astralcord.svg").read_text()
 SMALL = (ART / "astralcord-small.svg").read_text()
 # Bold four-point star from the small master: the mark, trimmed to its own bounding box.

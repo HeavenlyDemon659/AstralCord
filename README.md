@@ -84,14 +84,14 @@ The rename is done by a script, so the code can be refreshed from upstream at an
 ```sh
 git rm -rq . && git clean -fdxq                                    # empty the tree
 git -C /path/to/Serein archive HEAD | tar -x && git add -A          # new Serein snapshot
-git checkout HEAD -- tools/astralcord .github/workflows/build.yml   # AstralCord's own files
-python3 tools/astralcord/rebrand.py && python3 tools/astralcord/icons.py
+git checkout HEAD -- astralcord .github/workflows/build.yml   # AstralCord's own files
+python3 astralcord/rebrand.py && python3 astralcord/icons.py
 git checkout HEAD -- README.md assets/brand/README.md               # AstralCord's docs
 ```
 
 Then commit and push, and a new build is released.
 
-[`tools/astralcord/rebrand.py`](tools/astralcord/rebrand.py) explains what it changes and what it
+[`astralcord/rebrand.py`](astralcord/rebrand.py) explains what it changes and what it
 deliberately leaves alone. Internal names such as the `.serein-extension` format stay the same, so
 Serein's extensions and extension catalog keep working.
 

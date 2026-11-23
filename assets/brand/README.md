@@ -1,8 +1,8 @@
 # AstralCord brand assets
 
 AstralCord's mark is a four-point "astral" star, shown white on a deep-violet disc with a faint
-orbit ring in the full-colour icon. The masters live in `tools/astralcord/art/`, and
-`python3 tools/astralcord/icons.py` regenerates every file below (and the packaged icons) from them.
+orbit ring in the full-colour icon. The masters live in `astralcord/art/`, and
+`python3 astralcord/icons.py` regenerates every file below (and the packaged icons) from them.
 The upstream Serein file names are kept because code and packaging refer to them.
 
 - `serein.svg`: the full-colour AstralCord icon, the master vector source.

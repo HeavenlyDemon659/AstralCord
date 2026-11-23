@@ -4,7 +4,7 @@
 Run from anywhere after replacing the tree with a fresh Serein checkout and staging it
 (`git add -A`), because files are found through the Git index:
 
-    python3 tools/astralcord/rebrand.py
+    python3 astralcord/rebrand.py
 
 Changed: everything a user sees or the OS keys on. That covers the name in the interface and
 all translations, the app ID, the executable, the installer, the AppImage, the Start Menu
@@ -29,7 +29,7 @@ LOWER = "astralcord"
 APP_ID = "com.astralcord.client"
 UPSTREAM_ID = "cz.viceverse.serein"
 REPO = "HeavenlyDemon659/AstralCord"
-ROOT = pathlib.Path(__file__).resolve().parents[2]
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 changed: dict[str, set[str]] = {}
 problems: list[str] = []
@@ -175,7 +175,7 @@ def upstream_housekeeping() -> None:
 def main() -> None:
     code = [p for p in tracked("apps", "crates", "tools", "tests")
             if p.suffix in {".rs", ".toml", ".cjs", ".py", ".json", ".sh"}
-            and "tools/astralcord/" not in p.as_posix()]  # never rewrite these scripts themselves
+            and not p.as_posix().startswith(str(ROOT / "astralcord") + "/")]  # never rewrite these scripts themselves
     linux_pkg = tracked("packaging/linux", "packaging/appimage")
     windows_pkg = [p for p in tracked("packaging/windows") if p.suffix in {".nsi", ".ps1", ".cmd", ".py", ".md", ".rc"}]
     templates = tracked(".github/ISSUE_TEMPLATE")
