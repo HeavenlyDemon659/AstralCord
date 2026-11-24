@@ -13,10 +13,6 @@ little memory. It supports:
 - Themes and extensions
 - A tray icon and global push-to-talk
 
-> [!WARNING]
-> **Unofficial and not endorsed by Discord.** Like Serein, AstralCord talks to Discord's servers
-> directly with your account. Discord's Terms of Service don't allow this, and accounts can be
-> terminated for it. Use it at your own risk, ideally not on an account you can't afford to lose.
 
 ## Download
 
