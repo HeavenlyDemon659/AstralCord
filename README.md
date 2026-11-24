@@ -13,10 +13,6 @@ little memory. It supports:
 - Themes and extensions
 - A tray icon and global push-to-talk
 
-AstralCord is a renamed build of [Serein](https://github.com/ViceVerse-cz/Serein) by ViceVerse-cz
-and contributors. All the hard work is theirs. Serein's full documentation is in
-[`docs/serein-README.md`](docs/serein-README.md) and [`docs/`](docs/).
-
 > [!WARNING]
 > **Unofficial and not endorsed by Discord.** Like Serein, AstralCord talks to Discord's servers
 > directly with your account. Discord's Terms of Service don't allow this, and accounts can be
