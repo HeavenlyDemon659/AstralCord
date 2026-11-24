@@ -156,6 +156,6 @@ jobs:
           **Linux (x86_64, any distro)**
           - \`astralcord-$TAG-Linux-X64.AppImage\`: \`chmod +x\` it and run it. It needs GTK 4 and WebKitGTK 6.0 from your distro.
 
-          AstralCord updates itself from these releases. It's a rebrand of [Serein](https://github.com/ViceVerse-cz/Serein) (MIT OR Apache-2.0).
+          AstralCord updates itself from these releases.
           EOF
           gh release create "$TAG" release-assets/* --prerelease --title "AstralCord $TAG" --notes-file notes.md --target "$GITHUB_SHA"
