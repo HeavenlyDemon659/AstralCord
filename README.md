@@ -1,4 +1,4 @@
-<div align="center">
+zQ<div align="center">
   <img src="packaging/linux/hicolor/256x256/apps/astralcord.png" width="128" alt="AstralCord logo">
   <h1>AstralCord</h1>
   <p>A fast, native Discord client written in Rust, for Windows and Linux.</p>
@@ -73,26 +73,6 @@ To build locally, follow Serein's instructions in [`docs/serein-README.md`](docs
 The pinned toolchain is Rust 1.99.1. Run `cargo xtask package` on Windows, or
 `cargo xtask package --format appimage` on Linux.
 
-### Picking up new Serein versions
-
-The rename is done by a script, so the code can be refreshed from upstream at any time:
-
-```sh
-git rm -rq . && git clean -fdxq                                    # empty the tree
-git -C /path/to/Serein archive HEAD | tar -x && git add -A          # new Serein snapshot
-git checkout HEAD -- astralcord .github/workflows/build.yml   # AstralCord's own files
-python3 astralcord/rebrand.py && python3 astralcord/icons.py
-git checkout HEAD -- README.md assets/brand/README.md               # AstralCord's docs
-```
-
-Then commit and push, and a new build is released.
-
-[`astralcord/rebrand.py`](astralcord/rebrand.py) explains what it changes and what it
-deliberately leaves alone. Internal names such as the `.serein-extension` format stay the same, so
-Serein's extensions and extension catalog keep working.
-
-Serein's other packaging (Flatpak, Nix, AUR, distro repositories, macOS) is left as upstream
-shipped it and isn't built for AstralCord.
 
 ## License
 
